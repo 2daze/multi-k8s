@@ -1,0 +1,23 @@
+sudo: required
+services:
+  - docker
+before_install:
+  - openssl aes-256-cbc -K $encrypted_ff68eaeaf96f_key -iv $encrypted_ff68eaeaf96f_iv -in multi-k8s-300021-87db654b23d0.json.enc -out multi-k8s-300021-87db654b23d0.json -d
+  - curl https://sdk.cloud.google.com | bash > /dev/null;
+  - source $HOME/google-cloud-sdk/path.bach.inc
+  - curl gcloud components update kubectl
+  - gcloud auth activate-service-account --key-file service-account.json
+  - gcloud config sest project multi-k8s-300021
+  - gcloud config set compute/zone us-central1-b
+  - gcloud container clusters get-credentials multi-cluster
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker build -t 2dazed/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  docker run -e CI=true 2dazed/react-test npm test
+
+deploy:
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: master

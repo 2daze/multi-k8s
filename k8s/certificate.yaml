@@ -1,0 +1,19 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: abner2days-xyz-tls
+spec:
+  secretName: abner2days-xyz-tls
+  issuerRef: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: abner2days.xyz
+  dnsNames:
+    - abner2days.xyz
+    - www.abner2days.xyz
+  acme:
+    config:
+      - http01:
+          ingressClass: nginx
+        domains:
+          - abner2days.xyz
+          - www.abner2days.xyz
